@@ -16,25 +16,28 @@ import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final int MIN = 1; // eine Minute
-    private final int MAX = 10; // 10 Minuten
+    private final int MIN = 1; // 1 = 30 Sekunden
+    private final int DEFAULT_MIN_IN_MS = MIN * 30 * 1000; // 30 sekunden
+    private final int MAX = 20; // 20 = 10 Minuten
 
     private final String START = "Start";
     private final String STOPP = "Stopp";
-    private int eggTime = MIN * 1000;
+    private int eggTime = DEFAULT_MIN_IN_MS;
     private CountDownTimer timer;
     private MediaPlayer mediaPlayer;
     private boolean toggle = true; // Status des Button
     private TextView timerView;
+    private Button button;
+    private SeekBar seekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        button = findViewById(R.id.toggleButton);
         mediaPlayer = MediaPlayer.create(this,R.raw.horn);
 
-        SeekBar seekBar = findViewById(R.id.seekBarTime);
+        seekBar = findViewById(R.id.seekBarTime);
         seekBar.setProgress(MIN);
         seekBar.setMax(MAX);
 
@@ -51,11 +54,10 @@ public class MainActivity extends AppCompatActivity {
                     seekBar.setProgress(MAX); // 10 Minuten Eier sollten hart sein.
                 }
 
-                eggTime = sekunden * 60 * 1000;
-
-
-
-                timerView.setText(formatTime(eggTime));
+                if(sekunden >= MIN && sekunden <=MAX) {
+                    eggTime = sekunden * DEFAULT_MIN_IN_MS;
+                    timerView.setText(formatTime(eggTime));
+                }
             }
 
 
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void buttonPressed(View view){
 
-        final Button button = findViewById(R.id.toggleButton);
+
 
         if(toggle) {
             button.setText(STOPP);
@@ -104,13 +106,12 @@ public class MainActivity extends AppCompatActivity {
 
             toggle = false;
         }else{
-
+            eggTime = seekBar.getProgress() * DEFAULT_MIN_IN_MS;
             timer.cancel();
-
-            // TODO: alles wieder zurücksetzen
-
             toggle = true;
             button.setText(START);
+            timerView.setText(formatTime(eggTime));
+
         }
     }
 
